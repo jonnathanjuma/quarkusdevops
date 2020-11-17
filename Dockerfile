@@ -1,12 +1,7 @@
-FROM quay.io/quarkus/centos-quarkus-maven:20.2.0-java11 AS build
-WORKDIR /usr/src/app/
-#RUN mvn -f /usr/src/app/build.gradle -B de.qaware.maven:go-offline-maven-plugin:1.2.5:resolve-dependencies
-#COPY src /usr/src/app/src
-USER root
-RUN chown -R quarkus /usr/src/app
-COPY . /usr/src/app/
-USER quarkus
-RUN gradle build -Dquarkus.package.type=fast-jar
+FROM gradle:6.7.0-jdk11-openj9 AS build
+COPY --chown=gradle:gradle . /home/gradle/src
+WORKDIR /home/gradle/src
+RUN gradle build
 RUN ls -al build && pwd
 
 
@@ -34,10 +29,10 @@ RUN microdnf install curl ca-certificates ${JAVA_PACKAGE} \
 # Configure the JAVA_OPTIONS, you can add -XshowSettings:vm to also display the heap size.
 ENV JAVA_OPTIONS="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
 WORKDIR /work/
-COPY --from=build /usr/src/app/build/*-runner.jar /work/application
+COPY --from=build /home/gradle/src/build/*-runner.jar /work/application
 
-COPY --chown=1001 --from=build /usr/src/app/build/lib/ /deployments/lib/
-COPY --chown=1001 --from=build /usr/src/app/build/*.jar /deployments/
+COPY --chown=1001 --from=build /home/gradle/src/build/lib/ /deployments/lib/
+COPY --chown=1001 --from=build /home/gradle/src/build/*.jar /deployments/
 
 EXPOSE 8080
 USER 1001
