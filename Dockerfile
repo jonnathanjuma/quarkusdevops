@@ -3,7 +3,7 @@ COPY --chown=gradle:gradle . /home/gradle/src
 WORKDIR /home/gradle/src
 RUN gradle build
 RUN ls -al build && pwd
-
+RUN gradle sonarqube -Dsonar.host.url=http://35.245.152.51/ -Dsonar.verbose=true
 
 ## Stage 2 : create the docker final image
 FROM registry.access.redhat.com/ubi8/ubi-minimal
