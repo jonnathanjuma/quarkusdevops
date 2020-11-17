@@ -29,10 +29,10 @@ RUN microdnf install curl ca-certificates ${JAVA_PACKAGE} \
 # Configure the JAVA_OPTIONS, you can add -XshowSettings:vm to also display the heap size.
 ENV JAVA_OPTIONS="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
 WORKDIR /work/
-COPY --from=build /home/gradle/src/build/*-runner.jar /work/application
+#COPY --from=build /home/gradle/src/build/*-runner.jar /work/application
 
 COPY --chown=1001 --from=build /home/gradle/src/build/lib/ /deployments/lib/
-COPY --chown=1001 --from=build /home/gradle/src/build/*.jar /deployments/
+COPY --chown=1001 --from=build /home/gradle/src/build/*-runner.jar /deployments/
 
 EXPOSE 8080
 USER 1001
